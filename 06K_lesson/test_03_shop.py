@@ -5,6 +5,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.firefox.service import Service
 from webdriver_manager.firefox import GeckoDriverManager
+import re
 
 
 @pytest.fixture
@@ -73,8 +74,14 @@ def test_saucedemo_checkout_total(driver):
     )
     total_text = total_element.text
 
+    match = re.search(r'(\$\d+\.\d{2})', total_text)
+    if match:
+        actual_total = match.group(1)
+    else:
+        actual_total = total_text
+
     expected_total = "$58.29"
-    assert total_text == expected_total, (
+    assert actual_total == expected_total, (
         f"Ожидалась итоговая сумма '{expected_total}', "
-        f"но получена '{total_text}'"
+        f"но получена '{actual_total}' (полный текст: '{total_text}')"
     )
